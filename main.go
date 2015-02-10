@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/datacratic/gometrics"
-	"github.com/datacratic/gortb"
 )
 
 type Stream struct {
@@ -48,8 +47,7 @@ type Reports struct {
 }
 
 type Tailer struct {
-	rtb.Component
-
+	monitor metric.Monitor
 	reports Reports
 	clients atomic.Value
 	mu      sync.Mutex
@@ -104,10 +102,10 @@ func main() {
 		}
 	}()
 
-	trailer.Name = "trail"
 	if *carbon != "" {
 		urls := strings.Split(*carbon, ",")
 		trailer.Monitor = metric.NewCarbonMonitor(*server, urls)
+		trailer.Monitor.Name = "trail"
 		trailer.Monitor.PublishInterval = 10 * time.Second
 		trailer.Monitor.Start()
 	}
@@ -195,7 +193,9 @@ func (trailer *Tailer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					BytesSent: count,
 				}
 
-				trailer.RecordMetrics(&metrics)
+				if trailer.Monitor != nil {
+					trailer.Monitor.RecordMetrics(&metrics)
+				}
 
 				lines = 0
 				count = 0
@@ -280,7 +280,9 @@ func (trailer *Tailer) process(text string) {
 		}
 	}
 
-	trailer.RecordMetrics(&metrics)
+	if trailer.Monitor != nil {
+		trailer.Monitor.RecordMetrics(&metrics)
+	}
 }
 
 func (trailer *Tailer) New() (stream *Stream) {
