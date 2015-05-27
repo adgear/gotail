@@ -47,7 +47,7 @@ type Reports struct {
 }
 
 type Tailer struct {
-	monitor metric.Monitor
+	Monitor *metric.Monitor
 	reports Reports
 	clients atomic.Value
 	mu      sync.Mutex
@@ -194,7 +194,7 @@ func (trailer *Tailer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				if trailer.Monitor != nil {
-					trailer.Monitor.RecordMetrics(&metrics)
+					trailer.Monitor.RecordMetrics("trailer", &metrics)
 				}
 
 				lines = 0
@@ -281,7 +281,7 @@ func (trailer *Tailer) process(text string) {
 	}
 
 	if trailer.Monitor != nil {
-		trailer.Monitor.RecordMetrics(&metrics)
+		trailer.Monitor.RecordMetrics("process", &metrics)
 	}
 }
 
