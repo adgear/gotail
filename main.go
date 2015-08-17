@@ -79,7 +79,7 @@ func main() {
 		log.Fatal("missing '--file' parameter")
 	}
 
-	cmd := exec.Command("tail", "-f", *filename)
+	cmd := exec.Command("tail", "-c", "+1", "-f", *filename)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal(err)
