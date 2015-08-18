@@ -236,32 +236,35 @@ func (trailer *Tailer) process(text string) {
 	values := front.Value.(*Counts)
 
 	// parse the text line
-	tokens := strings.Split(text, " ")
-	switch tokens[0] {
-	case "AUCTION":
-		values.BidRequest++
-	case "SUBMITTED":
-		values.Bid++
-	case "WIN":
-		values.Win.Total++
-	case "MATCHEDLOSS":
-		values.Win.Late++
-	case "MATCHEDWIN":
-		values.Win.Matched++
-	case "UNMATCHEDWIN":
-		values.Win.Unmatched++
-	case "CLICK":
-		values.Click.Total++
-	case "MATCHEDCLICK":
-		values.Click.Matched++
-	case "UNMATCHEDCLICK":
-		values.Click.Unmatched++
-	case "CONVERSION":
-		values.Conversion.Total++
-	case "MATCHEDCONVERSION":
-		values.Conversion.Matched++
-	case "UNMATCHEDCONVERSION":
-		values.Conversion.Unmatched++
+	offset := 16
+	if len(text) > offset {
+		tokens := strings.SplitAfterN(text[16:], " ", 4)
+		switch tokens[0] {
+		case "AUCTION":
+			values.BidRequest++
+		case "SUBMITTED":
+			values.Bid++
+		case "WIN":
+			values.Win.Total++
+		case "MATCHEDLOSS":
+			values.Win.Late++
+		case "MATCHEDWIN":
+			values.Win.Matched++
+		case "UNMATCHEDWIN":
+			values.Win.Unmatched++
+		case "CLICK":
+			values.Click.Total++
+		case "MATCHEDCLICK":
+			values.Click.Matched++
+		case "UNMATCHEDCLICK":
+			values.Click.Unmatched++
+		case "CONVERSION":
+			values.Conversion.Total++
+		case "MATCHEDCONVERSION":
+			values.Conversion.Matched++
+		case "UNMATCHEDCONVERSION":
+			values.Conversion.Unmatched++
+		}
 	}
 
 	if e := front.Next(); e != nil {
